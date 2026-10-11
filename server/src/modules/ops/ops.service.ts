@@ -35,7 +35,7 @@ async function transition(loanId: string, from: LoanStatus, to: LoanStatus, set:
   const loan = await Loan.findOneAndUpdate(
     { _id: loanId, status: from },
     { $set: { status: to, ...set } },
-    { new: true },
+    { returnDocument: "after" },
   );
   if (loan) return loan;
 
@@ -88,7 +88,7 @@ export async function recordPayment(loanId: string, by: string, input: PaymentIn
   const updated = await Loan.findOneAndUpdate(
     { _id: loanId, status: "DISBURSED", amountPaid: { $lte: loan.totalRepayment - input.amount } },
     { $inc: { amountPaid: input.amount } },
-    { new: true },
+    { returnDocument: "after" },
   );
   if (!updated) throw conflict("Loan balance changed, please refresh and try again");
 
